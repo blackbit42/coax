@@ -496,10 +496,9 @@ class StartOperation(WriteCommand):
     """START_OPERATION command."""
 
     def pack_outbound_frame(self):
-        raise NotImplementedError
+        command_word = pack_command_word(Command.START_OPERATION)
 
-    def unpack_inbound_frame(self, words):
-        raise NotImplementedError
+        return (FrameFormat.WORD_DATA, command_word)
 
 class DiagnosticReset(WriteCommand):
     """DIAGNOSTIC_RESET command."""
