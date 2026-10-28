@@ -46,11 +46,11 @@ all: $(TOP_BIN) $(TOP_TIMING)
 
 # Synthesize with Yosys
 $(TOP_JSON): $(V_SOURCES)
-	$(YOSYS) -p "read_verilog -sv $(V_SOURCES); synth_ice40 -top top -json $@"
+	$(YOSYS) -q -p "read_verilog -sv $(V_SOURCES); synth_ice40 -top top -json $@"
 
 # Place and route with nextpnr
 $(TOP_ASC): $(TOP_JSON) $(PCF)
-	$(NEXTPNR) --$(DEVICE) --package $(PACKAGE) \
+	$(NEXTPNR) -q --$(DEVICE) --package $(PACKAGE) \
 		--json $< \
 		--pcf $(PCF) \
 		--asc $@ \
@@ -59,7 +59,7 @@ $(TOP_ASC): $(TOP_JSON) $(PCF)
 
 # Generate timing report
 $(TOP_TIMING): $(TOP_ASC)
-	$(NEXTPNR) --$(DEVICE) --package $(PACKAGE) \
+	$(NEXTPNR) -q --$(DEVICE) --package $(PACKAGE) \
 		--json $(TOP_JSON) \
 		--pcf $(PCF) \
 		--asc $< \

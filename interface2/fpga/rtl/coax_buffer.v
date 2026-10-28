@@ -89,6 +89,6 @@ module coax_buffer (
     always @(posedge clk)
     begin
         almost_empty <= (level <= ALMOST_EMPTY_THRESHOLD);
-        almost_full <= (level >= ALMOST_FULL_THRESHOLD);
+        almost_full <= (level >= $unsigned(ALMOST_FULL_THRESHOLD));
     end
 endmodule

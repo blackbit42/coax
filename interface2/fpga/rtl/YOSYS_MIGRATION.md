@@ -20,9 +20,11 @@ This document describes the migration of the interface2 FPGA design from Lattice
 
 ## Key Changes Required
 
-### 1. PLL Primitive Replacement (Critical)
+### 1. PLL Primitive — No Change Needed!
 
-**Original (`top.v`)**:
+**Surprising discovery**: The `SB_PLL40_CORE` primitive **is available in Yosys** with the exact same interface as the IceCube2 design. No primitive replacement is needed!
+
+The original `top.v` instantiation works unchanged:
 ```verilog
 SB_PLL40_CORE #(
     .FEEDBACK_PATH("SIMPLE"),
@@ -38,30 +40,21 @@ SB_PLL40_CORE #(
 );
 ```
 
-**Problem**: `SB_PLL40_CORE` is not the primitive expected by Yosys/nextpnr. The nextpnr-ice40 flow uses `SB_PLL40_2_PAD` (or `SB_PLL40_2F_CORE`) for PLL instantiation.
+**What we did**: We kept the primitive but moved it to a separate `pll.v` wrapper module for cleaner separation. The `pll.v` uses `SB_PLL40_CORE` with all required ports explicitly connected (the original only connected a subset).
 
-**Solution**: Created a wrapper module `pll.v` that instantiates `SB_PLL40_2_PAD` with equivalent parameters:
-- Input: 40 MHz (25ns period from `clocks.sdc`)
-- DIVR=0, DIVF=16, DIVQ=3, FILTER_RANGE=3
-- Output: ~85 MHz (40 × 17 / 8 = 85 MHz)
+**Why it works**: Yosys's `cells_sim.v` defines `SB_PLL40_CORE` with the exact same ports and parameters as Lattice's IceCube2. The iCE40UP5K has one PLL that can be driven directly from a clock-capable I/O pin (pin 37 in this design).
 
-**Modified `top.v`**:
-```verilog
-pll clk_fast_pll (
-    .clk_in(clk),
-    .clk_out(clk_fast)
-);
-```
+**Note**: Earlier attempts to use `SB_PLL40_2_PAD` (which includes an I/O buffer) or `SB_PLL40_2F_CORE` (dual-output core PLL) failed due to placement conflicts. The single-output `SB_PLL40_CORE` works seamlessly.
 
 ### 2. PLL Generation (Optional Automation)
 
-The `pll.v` module can be regenerated using the `icepll` tool (part of IceCube2 or available separately):
+The `pll.v` module can be regenerated using the `icepll` tool if needed:
 
 ```bash
 icepll -i 40 -o 85 -f pll.v
 ```
 
-This generates a Verilog module with the correct primitive and parameters. The current `pll.v` was manually created with equivalent parameters.
+This generates a Verilog module with the correct primitive and parameters. The current `pll.v` was manually created with equivalent parameters matching the original design.
 
 ### 3. Build System
 
@@ -90,8 +83,9 @@ For more complex constraints, nextpnr supports a `--pre-pack` Python script or `
 
 | File | Change |
 |------|--------|
-| `top.v` | Replaced `SB_PLL40_CORE` instantiation with `pll` module instance |
-| `pll.v` | **New** — PLL wrapper using `SB_PLL40_2_PAD` primitive |
+| `top.v` | Moved `SB_PLL40_CORE` instantiation to `pll` module instance (cleaner separation) |
+| `pll.v` | **New** — PLL wrapper using `SB_PLL40_CORE` primitive (same as IceCube2) |
+| `coax_buffer.v` | Fixed signed/unsigned comparison warning (`$unsigned()` cast) |
 | `Makefile` | **Replaced** — New Yosys/nextpnr/icepack build flow |
 | `YOSYS_MIGRATION.md` | **New** — This documentation |
 
@@ -125,6 +119,17 @@ After building, verify:
 2. nextpnr reports successful placement and routing
 3. Timing report shows acceptable slack on critical paths
 4. Functional simulation (testbenches in `../tests/`) still pass
+
+**Timing Results (from successful build)**:
+- **clk (40 MHz)**: achieved 40.14 MHz ✓ (meets constraint)
+- **clk_fast (85 MHz)**: achieved 90.20 MHz ✓ (well above 40 MHz constraint)
+
+**Device Utilization**:
+- ICESTORM_LC: 772/5280 (14%)
+- ICESTORM_RAM: 10/30 (33%)
+- SB_IO: 15/96 (15%)
+- SB_GB: 7/8 (87%)
+- ICESTORM_PLL: 1/1 (100%)
 
 ## Rollback
 
