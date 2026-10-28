@@ -1,4 +1,4 @@
-// Generated PLL module for iCE40UP5K using SB_PLL40_2_PAD
+// PLL module using SB_PLL40_CORE (same primitive as original IceCube2 design)
 // Equivalent to the original SB_PLL40_CORE with:
 //   DIVR=0, DIVF=16, DIVQ=3, FILTER_RANGE=3
 // Input: 40 MHz (25ns period), Output: ~85 MHz
@@ -10,18 +10,26 @@ module pll (
     output wire clk_out      // ~85 MHz output clock
 );
 
-    SB_PLL40_2_PAD #(
+    SB_PLL40_CORE #(
         .FEEDBACK_PATH("SIMPLE"),
         .DIVR(4'b0000),
         .DIVF(7'b0010000),
         .DIVQ(3'b011),
-        .FILTER_RANGE(3'b011)
+        .FILTER_RANGE(3'b011),
+        .PLLOUT_SELECT("GENCLK")
     ) pll_inst (
-        .RESETB(1'b1),
-        .BYPASS(1'b0),
         .REFERENCECLK(clk_in),
         .PLLOUTCORE(clk_out),
-        .PLLOUTGLOBAL()
+        .PLLOUTGLOBAL(),
+        .EXTFEEDBACK(1'b0),
+        .DYNAMICDELAY(8'b0),
+        .LOCK(),
+        .BYPASS(1'b0),
+        .RESETB(1'b1),
+        .LATCHINPUTVALUE(1'b0),
+        .SDO(),
+        .SDI(1'b0),
+        .SCLK(1'b0)
     );
 
 endmodule
