@@ -58,17 +58,9 @@ module top (
 
     wire clk_fast;
 
-    SB_PLL40_CORE #(
-        .FEEDBACK_PATH("SIMPLE"),
-        .DIVR(4'b0000),
-        .DIVF(7'b0010000),
-        .DIVQ(3'b011),
-        .FILTER_RANGE(3'b011)
-    ) clk_fast_pll (
-        .RESETB(1'b1),
-        .BYPASS(1'b0),
-        .REFERENCECLK(clk),
-        .PLLOUTCORE(clk_fast)
+    pll clk_fast_pll (
+        .clk_in(clk),
+        .clk_out(clk_fast)
     );
 
     wire [7:0] spi_rx_data;
