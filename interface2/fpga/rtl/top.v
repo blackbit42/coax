@@ -122,6 +122,7 @@ module top (
     wire rx_protocol;
     wire rx_parity;
 
+    /* verilator lint_off PINCONNECTEMPTY */
     coax_buffered_rx #(
         .CLOCKS_PER_BIT(CLOCKS_PER_BIT),
         .DEPTH(2048)
@@ -134,13 +135,17 @@ module top (
         .data(rx_data),
         .read_strobe(rx_read_strobe),
         .empty(rx_empty),
+        .full(),
         .protocol(rx_protocol),
         .parity(rx_parity)
     );
+    /* verilator lint_on PINCONNECTEMPTY */
 
     wire loopback;
     wire rx_debug;
 
+    /* verilator lint_off PINMISSING */
+/* verilator lint_off PINCONNECTEMPTY */
     coax_tx_rx_frontend #(
         .CLOCKS_PER_BIT(CLOCKS_PER_BIT)
     ) coax_tx_rx_frontend (
@@ -153,12 +158,15 @@ module top (
         .rx_output(internal_rx),
 
         .tx_active_output(tx_active),
+        .tx_output(),
         .tx_n_output(tx_n),
         .tx_delay_output(tx_delay),
         .rx_input(rx),
 
         .rx_debug(rx_debug)
     );
+    /* verilator lint_on PINCONNECTEMPTY */
+    /* verilator lint_on PINMISSING */
 
     control control (
         .clk(clk),

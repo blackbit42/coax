@@ -5,6 +5,7 @@
 
 `default_nettype none
 
+/* verilator lint_off PINCONNECTEMPTY */
 module pll (
     input  wire clk_in,      // 40 MHz input clock
     output wire clk_out      // ~85 MHz output clock
@@ -33,3 +34,4 @@ module pll (
     );
 
 endmodule
+/* verilator lint_on PINCONNECTEMPTY */
