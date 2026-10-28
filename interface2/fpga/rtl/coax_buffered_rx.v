@@ -14,6 +14,7 @@
 
 `default_nettype none
 
+/* verilator lint_off MULTITOP */
 module coax_buffered_rx (
     input clk,
     input reset,
@@ -51,6 +52,10 @@ module coax_buffered_rx (
     );
 
     wire [9:0] coax_buffer_data;
+    /* verilator lint_off UNUSEDSIGNAL */
+    wire coax_buffer_almost_empty;
+    wire coax_buffer_almost_full;
+    /* verilator lint_on UNUSEDSIGNAL */
 
     coax_buffer #(
         .DEPTH(DEPTH)
@@ -62,6 +67,8 @@ module coax_buffered_rx (
         .read_data(coax_buffer_data),
         .read_strobe(read_strobe && !error),
         .empty(empty),
+        .almost_empty(coax_buffer_almost_empty),
+        .almost_full(coax_buffer_almost_full),
         .full(full)
     );
 

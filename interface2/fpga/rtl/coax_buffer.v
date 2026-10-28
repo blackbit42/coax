@@ -12,6 +12,7 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+/* verilator lint_off MULTITOP */
 `default_nettype none
 
 module coax_buffer (
@@ -89,6 +90,6 @@ module coax_buffer (
     always @(posedge clk)
     begin
         almost_empty <= (level <= ALMOST_EMPTY_THRESHOLD);
-        almost_full <= (level >= $unsigned(ALMOST_FULL_THRESHOLD));
+        almost_full <= (level >= ALMOST_FULL_THRESHOLD);
     end
 endmodule

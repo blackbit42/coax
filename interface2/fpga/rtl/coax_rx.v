@@ -28,7 +28,6 @@ module coax_rx (
     parameter CLOCKS_PER_BIT = 8;
 
     localparam CLOCKS_PER_HALF_BIT = CLOCKS_PER_BIT / 2;
-    localparam CLOCKS_PER_2_BIT = CLOCKS_PER_BIT * 2;
     localparam CLOCKS_PER_3_BIT = CLOCKS_PER_BIT * 3;
     localparam CLOCKS_LOSS_OF_MID_BIT_TRANSITION = CLOCKS_PER_BIT + (CLOCKS_PER_BIT / 2);
 

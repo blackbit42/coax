@@ -84,7 +84,7 @@ module fifo_sync_ram #(
 	// ------------------
 	// (counts the number of used words - 1)
 
-	always @(posedge clk or posedge rst)
+	always @(posedge clk)
 		if (rst)
 			level <= {(AWIDTH+1){1'b1}};
 		else
@@ -100,7 +100,7 @@ module fifo_sync_ram #(
 
 	assign full_nxt = level == { 1'b0, {(AWIDTH-2){1'b1}}, 2'b01 };
 
-	always @(posedge clk or posedge rst)
+	always @(posedge clk)
 		if (rst)
 			full <= 1'b0;
 		else
@@ -112,7 +112,7 @@ module fifo_sync_ram #(
 	// Write
 	// -----
 
-	always @(posedge clk or posedge rst)
+	always @(posedge clk)
 		if (rst)
 			ram_wr_addr <= 0;
 		else if (ram_wr_ena)
@@ -125,7 +125,7 @@ module fifo_sync_ram #(
 	// Read
 	// ----
 
-	always @(posedge clk or posedge rst)
+	always @(posedge clk)
 		if (rst)
 			ram_rd_addr <= 0;
 		else if (ram_rd_ena)
@@ -133,7 +133,7 @@ module fifo_sync_ram #(
 
 	assign ram_rd_ena = (rd_ena | ~rd_valid) & ~lvl_empty;
 
-	always @(posedge clk or posedge rst)
+	always @(posedge clk)
 		if (rst)
 			rd_valid <= 1'b0;
 		else if (rd_ena | ~rd_valid)

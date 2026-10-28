@@ -137,6 +137,7 @@ module control (
                         4'h4: next_state = STATE_TX_1;
                         4'h5: next_state = STATE_RX_1;
                         4'hf: next_state = STATE_RESET;
+                        default: next_state = STATE_IDLE;
                     endcase
                 end
             end
@@ -149,6 +150,7 @@ module control (
                     4'h1: next_spi_tx_data = { 1'b0, rx_error, rx_active, 1'b0, tx_complete, tx_active, 2'b0 };
                     4'h2: next_spi_tx_data = control_register;
                     4'hf: next_spi_tx_data = 8'ha5;
+                    default: next_spi_tx_data = 8'h00;
                 endcase
 
                 next_spi_tx_strobe = 1;
@@ -178,6 +180,7 @@ module control (
                 begin
                     case (command[7:4])
                         4'h2: next_control_register = (control_register & ~register_mask) | (spi_rx_data & register_mask);
+                        default: next_control_register = control_register;
                     endcase
 
                     next_state = STATE_IDLE;
