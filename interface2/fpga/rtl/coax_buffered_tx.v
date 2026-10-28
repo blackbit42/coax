@@ -30,7 +30,7 @@ module coax_buffered_tx (
 );
     parameter CLOCKS_PER_BIT = 8;
     parameter DEPTH = 256;
-    parameter START_DEPTH = DEPTH * 0.75;
+    parameter START_DEPTH = DEPTH * 3 / 4;
 
     localparam STATE_IDLE = 0;
     localparam STATE_TRANSMITTING_1 = 1;
